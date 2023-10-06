@@ -165,6 +165,7 @@ const drawSeabattle = (
   board: number[][],
   ships: IShip[]
 ): void => {
+  console.log("Drawing all...");
   ctx.clearRect(
     0,
     0,

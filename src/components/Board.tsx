@@ -1,9 +1,14 @@
 import { useEffect, useState, useRef } from "react";
 import { ALPHABETS, CONSTANTS, MISC } from "../constants";
 import { drawSeabattle } from "../drawing/draw";
-import { ICoord, IDragging } from "../types";
+import { ICoord, IDragging, IPlayer } from "../types";
 
-const Board = () => {
+interface IBoardProp {
+  type: string;
+  player: IPlayer;
+}
+
+const Board = ({ player }: IBoardProp) => {
   const [square, setSquare] = useState("");
   const [squareCoord, setSquareCoord] = useState<ICoord | undefined>(undefined);
   const [clicked, setClicked] = useState("");
@@ -14,7 +19,6 @@ const Board = () => {
   });
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const board: number[][] = Array.from(Array(10), () => Array(10).fill(0));
-  const name = "Player";
 
   useEffect(() => {
     if (!board) return;
@@ -134,7 +138,7 @@ const Board = () => {
             Clicked {clicked}
           </>
         )}
-        <p className="player-name">{name}</p>
+        <p className="player-name">{player.name}</p>
       </div>
       <div className="canvas-container">
         <canvas
