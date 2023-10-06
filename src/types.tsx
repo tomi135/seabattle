@@ -3,18 +3,18 @@ interface ICoord {
   y: number;
 }
 
-interface IDragging {
-  ship: null;
-  coordStart: null | ICoord;
-  coordDelta: null | ICoord;
-}
-
 interface IShip {
   coordStart: ICoord;
   direction: ICoord;
   length: number;
   hitSquares: number;
   floating: boolean;
+}
+
+interface IDragging {
+  ship: null | IShip;
+  coordStart: null | ICoord;
+  coordDelta: null | ICoord;
 }
 
 export type { ICoord, IDragging, IShip };
