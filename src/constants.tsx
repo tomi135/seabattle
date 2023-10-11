@@ -31,5 +31,12 @@ const BoardValues = {
   Safe: 5,
 };
 
+const up = { x: 0, y: -1 }; // 0 - up
+const right = { x: 1, y: 0 }; // 1 - right
+const down = { x: 0, y: 1 }; // 2 - down
+const left = { x: -1, y: 0 }; // 3 - left
+const none = { x: 0, y: 0 }; // 4 - stay put
+const direction = [up, right, down, left, none];
+
 // eslint-disable-next-line react-refresh/only-export-components
-export { CONSTANTS, MISC, ALPHABETS, BoardValues };
+export { CONSTANTS, MISC, ALPHABETS, BoardValues, direction };
