@@ -18,14 +18,13 @@ const Board = ({ player }: IBoardProp) => {
     coordDelta: null,
   });
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const board: number[][] = Array.from(Array(10), () => Array(10).fill(0));
 
   useEffect(() => {
-    if (!board) return;
+    if (!player) return;
     const context = canvasRef.current?.getContext("2d");
     if (!context) return;
-    drawSeabattle(context, board, []);
-  }, [board]);
+    drawSeabattle(context, player.board, player.ships);
+  }, [player]);
 
   const canvasClicked = (e: React.MouseEvent) => {
     //if (name === "mine") return;
@@ -76,7 +75,8 @@ const Board = ({ player }: IBoardProp) => {
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    const canvas = e.target as HTMLCanvasElement;
+    const canvas = canvasRef.current; //e.target as HTMLCanvasElement;
+    if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
     const canvasWidth = canvas.clientWidth - CONSTANTS.CANVAS_PADDING;
     setSquareCoord({
@@ -154,7 +154,7 @@ const Board = ({ player }: IBoardProp) => {
       {!MISC.HIDE_DEBUG && (
         <div className="header">
           <ul>
-            {board.map((value, index) => (
+            {player.board.map((value, index) => (
               <li key={index}>
                 {value.map((v, i) => (
                   <span key={i}>&nbsp;{v}&nbsp;</span>
