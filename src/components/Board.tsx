@@ -1,7 +1,10 @@
 import { useEffect, useState, useRef } from "react";
 import { ALPHABETS, CONSTANTS, MISC } from "../constants";
 import { drawSeabattle } from "../drawing/draw";
-import { ICoord, IDragging, IPlayer } from "../types";
+import { ICoord, IPlayer } from "../types";
+import { getShipIndexFromSquare, outOfBounds } from "../game/logic";
+
+import { useSeabattleStore } from "../store/seabattle.store";
 
 interface IBoardProp {
   type: string;
@@ -12,12 +15,10 @@ const Board = ({ player }: IBoardProp) => {
   const [square, setSquare] = useState("");
   const [squareCoord, setSquareCoord] = useState<ICoord | undefined>(undefined);
   const [clicked, setClicked] = useState("");
-  const [dragging, setDragging] = useState<IDragging>({
-    ship: null,
-    coordStart: null,
-    coordDelta: null,
-  });
+  //const [dragging, setDragging] = useState<IDragging | undefined>(undefined);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const state = useSeabattleStore((state) => state);
 
   useEffect(() => {
     if (!player) return;
@@ -64,14 +65,14 @@ const Board = ({ player }: IBoardProp) => {
       x: column - 1,
       y: row - 1,
     };
-    //const ship = getShipFromSquare(clickedCoord, player.ships);
-    const ship = null;
-    setDragging({
-      ship: ship,
-      coordStart: clickedCoord,
-      coordDelta: { x: 0, y: 0 },
-    });
-    console.log("Clicked square contains ship:", ship);
+
+    if (player.playerType !== "human") return;
+
+    const shipIndex = getShipIndexFromSquare(clickedCoord, player.ships);
+    console.log("Square contains ship:", shipIndex);
+    if (shipIndex < 0) return;
+
+    state.draggingStart(shipIndex, clickedCoord);
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -92,7 +93,7 @@ const Board = ({ player }: IBoardProp) => {
     setSquare("" + ALPHABETS[column] + row);
     setSquareCoord({ x: column, y: row });
 
-    if (!dragging.ship || !dragging.coordStart || !dragging.coordDelta) return;
+    if (!state.dragging) return;
 
     const currCoord = {
       x: column - 1,
@@ -104,26 +105,26 @@ const Board = ({ player }: IBoardProp) => {
       currCoord.y < 0 ||
       9 < currCoord.y
     ) {
-      setDragging({ ship: null, coordStart: null, coordDelta: null });
+      state.draggingEnd();
       return;
     }
     const delta: ICoord = {
-      x: currCoord.x - dragging.coordStart.x,
-      y: currCoord.y - dragging.coordStart.y,
+      x: currCoord.x - state.dragging.coordClick.x,
+      y: currCoord.y - state.dragging.coordClick.y,
     };
     if (
-      dragging.coordDelta.x !== delta.x ||
-      dragging.coordDelta.y !== delta.y
+      state.dragging.coordDelta.x !== delta.x ||
+      state.dragging.coordDelta.y !== delta.y
     ) {
       console.log("Delta:", delta);
-      setDragging((dragging) => ({ ...dragging, coordDelta: delta }));
-      // const context = canvasRef.current.getContext("2d");
-      // drawSeabattle(context, board, player.ships);
+      if (outOfBounds(currCoord, state.dragging)) return;
+
+      state.draggingUpdate(delta);
     }
   };
 
   const handleMouseUp = () => {
-    setDragging({ ship: null, coordStart: null, coordDelta: null });
+    state.draggingEnd();
   };
 
   return (
