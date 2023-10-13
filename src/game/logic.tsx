@@ -1,5 +1,46 @@
 import { BoardValues } from "../constants";
-import { IShip } from "../types";
+import { ICoord, IDragging, IShip } from "../types";
+
+const shipsDistanceAcceptable = (ship1: IShip, ship2: IShip) => {
+  if (
+    Math.abs(ship1.coordStart.x - ship2.coordStart.x) <= 1 &&
+    Math.abs(ship1.coordStart.y - ship2.coordStart.y) <= 1
+  )
+    return false;
+
+  if (
+    Math.abs(ship1.coordEnd.x - ship2.coordEnd.x) <= 1 &&
+    Math.abs(ship1.coordEnd.y - ship2.coordEnd.y) <= 1
+  )
+    return false;
+
+  if (
+    Math.abs(ship1.coordStart.x - ship2.coordEnd.x) <= 1 &&
+    Math.abs(ship1.coordStart.y - ship2.coordEnd.y) <= 1
+  )
+    return false;
+
+  if (
+    Math.abs(ship1.coordEnd.x - ship2.coordStart.x) <= 1 &&
+    Math.abs(ship1.coordEnd.y - ship2.coordStart.y) <= 1
+  )
+    return false;
+
+  return true;
+};
+
+const shipAdjacentToOther = (ships: IShip[]) => {
+  for (const ship of ships) ship.acceptable = true;
+  for (let i = 0; i < ships.length; i++) {
+    const s = ships[i];
+    for (let j = i + 1; j < ships.length; j++) {
+      if (!shipsDistanceAcceptable(s, ships[j])) {
+        s.acceptable = false;
+        ships[j].acceptable = false;
+      }
+    }
+  }
+};
 
 const shipAcceptableOnBoard = (board: number[][], ship: IShip): boolean => {
   const startCoord = ship.coordStart;
@@ -66,4 +107,60 @@ const shipToBoard = (board: number[][], ship: IShip): void => {
   }
 };
 
-export { shipAcceptableOnBoard, shipToBoard };
+const getShipFromSquare = (square: ICoord, ships: IShip[]) => {
+  for (const ship of ships) {
+    for (let i = 0; i < ship.length; i++) {
+      if (
+        ship.coordStart.x + i * ship.direction.x === square.x &&
+        ship.coordStart.y + i * ship.direction.y === square.y
+      )
+        return ship;
+    }
+  }
+  return null;
+};
+
+const getShipIndexFromSquare = (square: ICoord, ships: IShip[]): number => {
+  for (let j = 0; j < ships.length; j++) {
+    for (let i = 0; i < ships[j].length; i++) {
+      if (
+        ships[j].coordStart.x + i * ships[j].direction.x === square.x &&
+        ships[j].coordStart.y + i * ships[j].direction.y === square.y
+      )
+        return j;
+    }
+  }
+  return -1;
+};
+
+const outOfBounds = (currCoord: ICoord, dragging: IDragging): boolean => {
+  const deltaX = currCoord.x - dragging.coordClick.x;
+  const deltaY = currCoord.y - dragging.coordClick.y;
+
+  console.log(`start.x + deltaX = ${deltaX}`);
+  console.log(`start.y + deltaY = ${deltaY}`);
+  if (
+    dragging.originalCoordStart.x + deltaX < 0 ||
+    9 < dragging.originalCoordStart.x + deltaX ||
+    dragging.originalCoordStart.y + deltaY < 0 ||
+    9 < dragging.originalCoordStart.y + deltaY ||
+    dragging.originalCoordEnd.x + deltaX < 0 ||
+    9 < dragging.originalCoordEnd.x + deltaX ||
+    dragging.originalCoordEnd.y + deltaY < 0 ||
+    9 < dragging.originalCoordEnd.y + deltaY
+  ) {
+    console.log("Out of bounds");
+    return true;
+  }
+
+  return false;
+};
+
+export {
+  shipAdjacentToOther,
+  shipAcceptableOnBoard,
+  shipToBoard,
+  getShipFromSquare,
+  getShipIndexFromSquare,
+  outOfBounds,
+};

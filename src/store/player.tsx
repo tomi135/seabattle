@@ -19,12 +19,18 @@ const createShip = (
         ? dir[Math.floor(Math.random() * (dir.length - 1))]
         : dir[dir.length - 1];
 
+  const coordEnd: ICoord = {
+    x: startCoord.x + direction.x * (length - 1),
+    y: startCoord.y + direction.y * (length - 1),
+  };
   const ship = {
     coordStart: startCoord,
+    coordEnd: coordEnd,
     direction: direction,
     length: length,
     hitSquares: 0,
     floating: true,
+    acceptable: true,
   };
   return ship;
 };

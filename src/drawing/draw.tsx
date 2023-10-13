@@ -76,10 +76,15 @@ const drawShips = (ctx: CanvasRenderingContext2D, ships: IShip[]) => {
 
   console.log("Ships:", ships);
   for (const ship of ships) {
-    ctx.strokeStyle = ship.floating ? "blue" : "red";
-    ctx.fillStyle = ship.floating
-      ? "rgba(0, 255, 255, 0.3)"
-      : "rgba(255, 0,0,0.3)";
+    if (ship.acceptable) {
+      ctx.strokeStyle = ship.floating ? "blue" : "red";
+      ctx.fillStyle = ship.floating
+        ? "rgba(0, 255, 255, 0.3)"
+        : "rgba(255, 0,0,0.3)";
+    } else {
+      ctx.strokeStyle = "brown";
+      ctx.fillStyle = "rgba(166, 145, 92, 0.3)";
+    }
     let startX = CONSTANTS.SQUARE_WIDTH * (ship.coordStart.x + 1);
     let startY = CONSTANTS.SQUARE_WIDTH * (ship.coordStart.y + 1);
     if (ship.direction.x < 0) startX += CONSTANTS.SQUARE_WIDTH;

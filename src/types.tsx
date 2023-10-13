@@ -10,16 +10,20 @@ interface ILastHit {
 
 interface IShip {
   coordStart: ICoord;
+  coordEnd: ICoord;
   direction: ICoord;
   length: number;
   hitSquares: number;
   floating: boolean;
+  acceptable: boolean;
 }
 
 interface IDragging {
-  ship: null | IShip;
-  coordStart: null | ICoord;
-  coordDelta: null | ICoord;
+  shipIndex: number;
+  originalCoordStart: ICoord;
+  originalCoordEnd: ICoord;
+  coordClick: ICoord;
+  coordDelta: ICoord;
 }
 
 interface IPlayer {
