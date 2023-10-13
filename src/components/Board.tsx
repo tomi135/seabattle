@@ -105,7 +105,7 @@ const Board = ({ player }: IBoardProp) => {
       currCoord.y < 0 ||
       9 < currCoord.y
     ) {
-      state.draggingEnd();
+      //state.draggingEnd();
       return;
     }
     const delta: ICoord = {
