@@ -16,6 +16,7 @@ interface SeabattleState {
   draggingEnd: () => void;
   turnShip: (n: number) => void;
   start: () => void;
+  shootBoard: (id: number, coord: ICoord) => void;
 }
 
 const useSeabattleStore = create<SeabattleState>()((set) => ({
@@ -112,7 +113,13 @@ const useSeabattleStore = create<SeabattleState>()((set) => ({
       };
       return updatedState;
     }),
-  start: () => set((state) => ({ ...state, started: true })),
+  start: () =>
+    set((state) => ({ ...state, inTurn: state.playerHome, started: true })),
+  shootBoard: (id, coord) =>
+    set((state) => {
+      console.log("id:", id, coord);
+      return state;
+    }),
 }));
 
 export { useSeabattleStore };

@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { ALPHABETS, CONSTANTS, MISC } from "../constants";
 import { drawSeabattle } from "../drawing/draw";
-import { ICoord, IPlayer } from "../types";
+import { ICoord } from "../types";
 import { getShipIndexFromSquare, shipOutOfBounds } from "../game/logic";
 
 import { useSeabattleStore } from "../store/seabattle.store";
@@ -9,26 +9,26 @@ import { coordEqual, getCoordinate, outOfBounds } from "../util";
 
 interface IBoardProp {
   type: string;
-  player: IPlayer;
 }
 
-const Board = ({ player }: IBoardProp) => {
+const Board = ({ type }: IBoardProp) => {
   const [square, setSquare] = useState("");
   const [clicked, setClicked] = useState("");
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const state = useSeabattleStore((state) => state);
+  const player = state.playerHome;
 
   useEffect(() => {
-    if (!player) return;
     const context = canvasRef.current?.getContext("2d");
     if (!context) return;
-    drawSeabattle(context, player.board, player.ships);
-  }, [player]);
+    const board =
+      type === "mine" ? state.playerHome.board : state.playerHome.boardOpponent;
+    const ships = type === "mine" ? state.playerHome.ships : [];
+    drawSeabattle(context, board, ships);
+  }, [state, type]);
 
   const canvasClicked = (e: React.MouseEvent) => {
-    //if (name === "mine") return;
-
     const canvas = canvasRef.current; //HTMLCanvasElement;
     if (!canvas) return;
     const clickedCoord = getCoordinate(canvas, e);
@@ -36,9 +36,14 @@ const Board = ({ player }: IBoardProp) => {
 
     setSquare(ALPHABETS[clickedCoord.x + 1] + (clickedCoord.y + 1));
     setClicked(`x: ${clickedCoord.x}, y: ${clickedCoord.y}`);
+
+    if (type === "mine") return;
+    if (!state.started) return;
+    state.shootBoard(player.playerId, clickedCoord);
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
+    if (state.started) return;
     const canvas = canvasRef.current; //HTMLCanvasElement;
     if (!canvas) return;
     const clickedCoord = getCoordinate(canvas, e);
@@ -53,6 +58,7 @@ const Board = ({ player }: IBoardProp) => {
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
+    if (state.started) return;
     if (!state.dragging) return;
 
     const canvas = canvasRef.current; //e.target as HTMLCanvasElement;
@@ -77,6 +83,7 @@ const Board = ({ player }: IBoardProp) => {
   };
 
   const handleMouseUp = (e: React.MouseEvent) => {
+    if (state.started) return;
     if (!state.dragging) return;
 
     const canvas = canvasRef.current; //e.target as HTMLCanvasElement;
