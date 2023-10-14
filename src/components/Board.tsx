@@ -2,9 +2,10 @@ import { useEffect, useState, useRef } from "react";
 import { ALPHABETS, CONSTANTS, MISC } from "../constants";
 import { drawSeabattle } from "../drawing/draw";
 import { ICoord, IPlayer } from "../types";
-import { getShipIndexFromSquare, outOfBounds } from "../game/logic";
+import { getShipIndexFromSquare, shipOutOfBounds } from "../game/logic";
 
 import { useSeabattleStore } from "../store/seabattle.store";
+import { coordEqual, getCoordinate, outOfBounds } from "../util";
 
 interface IBoardProp {
   type: string;
@@ -13,9 +14,7 @@ interface IBoardProp {
 
 const Board = ({ player }: IBoardProp) => {
   const [square, setSquare] = useState("");
-  const [squareCoord, setSquareCoord] = useState<ICoord | undefined>(undefined);
   const [clicked, setClicked] = useState("");
-  //const [dragging, setDragging] = useState<IDragging | undefined>(undefined);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const state = useSeabattleStore((state) => state);
@@ -30,41 +29,19 @@ const Board = ({ player }: IBoardProp) => {
   const canvasClicked = (e: React.MouseEvent) => {
     //if (name === "mine") return;
 
-    const canvas = e.target as HTMLCanvasElement;
-    const rect = canvas.getBoundingClientRect();
-    const canvasWidth = canvas.clientWidth - CONSTANTS.CANVAS_PADDING;
+    const canvas = canvasRef.current; //HTMLCanvasElement;
+    if (!canvas) return;
+    const clickedCoord = getCoordinate(canvas, e);
+    if (outOfBounds(clickedCoord)) return;
 
-    const row = Math.floor(
-      (e.clientY - rect.top) / (canvasWidth / CONSTANTS.SQUARE_COUNT)
-    );
-    const column = Math.floor(
-      (e.clientX - rect.left) / (canvasWidth / CONSTANTS.SQUARE_COUNT)
-    );
-    setSquareCoord({
-      x: Math.floor(e.clientX - rect.left),
-      y: Math.floor(e.clientY - rect.top),
-    });
-    setClicked(`x: ${column}, y: ${row}`);
-    if (column < 1 || 10 < column || row < 1 || 10 < row) return;
-
-    //shootBoard(player.id, column, row);
-    //drawIntoSquare();
+    setSquare(ALPHABETS[clickedCoord.x + 1] + (clickedCoord.y + 1));
+    setClicked(`x: ${clickedCoord.x}, y: ${clickedCoord.y}`);
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
-    const canvas = e.target as HTMLCanvasElement;
-    const rect = canvas.getBoundingClientRect();
-    const canvasWidth = canvas.clientWidth - CONSTANTS.CANVAS_PADDING;
-    const row = Math.floor(
-      (e.clientY - rect.top) / (canvasWidth / CONSTANTS.SQUARE_COUNT)
-    );
-    const column = Math.floor(
-      (e.clientX - rect.left) / (canvasWidth / CONSTANTS.SQUARE_COUNT)
-    );
-    const clickedCoord = {
-      x: column - 1,
-      y: row - 1,
-    };
+    const canvas = canvasRef.current; //HTMLCanvasElement;
+    if (!canvas) return;
+    const clickedCoord = getCoordinate(canvas, e);
 
     if (player.playerType !== "human") return;
 
@@ -76,38 +53,14 @@ const Board = ({ player }: IBoardProp) => {
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    const canvas = canvasRef.current; //e.target as HTMLCanvasElement;
-    if (!canvas) return;
-    const rect = canvas.getBoundingClientRect();
-    const canvasWidth = canvas.clientWidth - CONSTANTS.CANVAS_PADDING;
-    setSquareCoord({
-      x: Math.floor(e.clientX - rect.left),
-      y: Math.floor(e.clientY - rect.top),
-    });
-    const row = Math.floor(
-      (e.clientY - rect.top) / (canvasWidth / CONSTANTS.SQUARE_COUNT)
-    );
-    const column = Math.floor(
-      (e.clientX - rect.left) / (canvasWidth / CONSTANTS.SQUARE_COUNT)
-    );
-    setSquare("" + ALPHABETS[column] + row);
-    setSquareCoord({ x: column, y: row });
-
     if (!state.dragging) return;
 
-    const currCoord = {
-      x: column - 1,
-      y: row - 1,
-    };
-    if (
-      currCoord.x < 0 ||
-      9 < currCoord.x ||
-      currCoord.y < 0 ||
-      9 < currCoord.y
-    ) {
-      //state.draggingEnd();
-      return;
-    }
+    const canvas = canvasRef.current; //e.target as HTMLCanvasElement;
+    if (!canvas) return;
+    const currCoord = getCoordinate(canvas, e);
+
+    if (outOfBounds(currCoord)) return;
+
     const delta: ICoord = {
       x: currCoord.x - state.dragging.coordClick.x,
       y: currCoord.y - state.dragging.coordClick.y,
@@ -117,14 +70,24 @@ const Board = ({ player }: IBoardProp) => {
       state.dragging.coordDelta.y !== delta.y
     ) {
       console.log("Delta:", delta);
-      if (outOfBounds(currCoord, state.dragging)) return;
+      if (shipOutOfBounds(currCoord, state.dragging)) return;
 
       state.draggingUpdate(delta);
     }
   };
 
-  const handleMouseUp = () => {
-    state.draggingEnd();
+  const handleMouseUp = (e: React.MouseEvent) => {
+    if (!state.dragging) return;
+
+    const canvas = canvasRef.current; //e.target as HTMLCanvasElement;
+    if (!canvas) return;
+    const currCoord = getCoordinate(canvas, e);
+
+    if (coordEqual(currCoord, state.dragging.coordClick)) {
+      state.turnShip(state.dragging.shipIndex);
+    } else {
+      state.draggingEnd();
+    }
   };
 
   return (
@@ -133,8 +96,6 @@ const Board = ({ player }: IBoardProp) => {
         {process.env.NODE_ENV !== "production" && !MISC.HIDE_DEBUG && (
           <>
             Square: {square}
-            <br />
-            Square coordinates x: {squareCoord?.x}, y: {squareCoord?.y}
             <br />
             Clicked {clicked}
           </>

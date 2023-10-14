@@ -133,7 +133,7 @@ const getShipIndexFromSquare = (square: ICoord, ships: IShip[]): number => {
   return -1;
 };
 
-const outOfBounds = (currCoord: ICoord, dragging: IDragging): boolean => {
+const shipOutOfBounds = (currCoord: ICoord, dragging: IDragging): boolean => {
   const deltaX = currCoord.x - dragging.coordClick.x;
   const deltaY = currCoord.y - dragging.coordClick.y;
 
@@ -162,5 +162,5 @@ export {
   shipToBoard,
   getShipFromSquare,
   getShipIndexFromSquare,
-  outOfBounds,
+  shipOutOfBounds,
 };

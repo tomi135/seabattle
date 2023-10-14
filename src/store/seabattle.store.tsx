@@ -14,6 +14,7 @@ interface SeabattleState {
   draggingStart: (n: number, c: ICoord) => void;
   draggingUpdate: (c: ICoord) => void;
   draggingEnd: () => void;
+  turnShip: (n: number) => void;
   start: () => void;
 }
 
@@ -64,6 +65,53 @@ const useSeabattleStore = create<SeabattleState>()((set) => ({
       return updatedState;
     }),
   draggingEnd: () => set((state) => ({ ...state, dragging: undefined })),
+  turnShip: (shipIndex) =>
+    set((state) => {
+      const updatedShips: IShip[] = [...state.playerHome.ships];
+      const currDirection = updatedShips[shipIndex].direction;
+      const updatedDirection: ICoord = {
+        x: currDirection.x === 0 ? 1 : 0,
+        y: currDirection.y === 0 ? 1 : 0,
+      };
+      let updatedStart: ICoord = updatedShips[shipIndex].coordStart;
+      let updatedEnd: ICoord = {
+        x:
+          updatedShips[shipIndex].coordStart.x +
+          updatedDirection.x * (updatedShips[shipIndex].length - 1),
+        y:
+          updatedShips[shipIndex].coordStart.y +
+          updatedDirection.y * (updatedShips[shipIndex].length - 1),
+      };
+      if (9 < updatedEnd.x) {
+        const shift = updatedEnd.x - 9;
+        updatedStart = { x: updatedStart.x - shift, y: updatedStart.y };
+        updatedEnd = { x: updatedEnd.x - shift, y: updatedEnd.y };
+      }
+      if (9 < updatedEnd.y) {
+        const shift = updatedEnd.y - 9;
+        updatedStart = { x: updatedStart.x, y: updatedStart.y - shift };
+        updatedEnd = { x: updatedEnd.x, y: updatedEnd.y - shift };
+      }
+
+      updatedShips[shipIndex] = {
+        ...updatedShips[shipIndex],
+        direction: updatedDirection,
+        coordStart: updatedStart,
+        coordEnd: updatedEnd,
+      };
+
+      shipAdjacentToOther(updatedShips);
+
+      const updatedState = {
+        ...state,
+        dragging: undefined,
+        playerHome: {
+          ...state.playerHome,
+          ships: updatedShips,
+        },
+      };
+      return updatedState;
+    }),
   start: () => set((state) => ({ ...state, started: true })),
 }));
 
