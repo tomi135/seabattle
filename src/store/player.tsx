@@ -1,7 +1,7 @@
 import { IPlayer } from "../types";
 import { ICoord, IShip } from "../types";
 import { direction as dir } from "../constants";
-import { shipAcceptableOnBoard, shipToBoard } from "../game/logic";
+import { shipAcceptableOnBoard, shipToBoard } from "../game/pre-game-logic";
 
 const createShip = (
   length: number,

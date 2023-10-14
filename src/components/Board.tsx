@@ -2,7 +2,10 @@ import { useEffect, useState, useRef } from "react";
 import { ALPHABETS, CONSTANTS, MISC } from "../constants";
 import { drawSeabattle } from "../drawing/draw";
 import { ICoord } from "../types";
-import { getShipIndexFromSquare, shipOutOfBounds } from "../game/logic";
+import {
+  getShipIndexFromSquare,
+  shipOutOfBounds,
+} from "../game/pre-game-logic";
 
 import { useSeabattleStore } from "../store/seabattle.store";
 import { coordEqual, getCoordinate, outOfBounds } from "../util";

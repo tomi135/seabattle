@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { ICoord, IDragging, IPlayer, IShip } from "../types";
 import { createPlayer } from "./player";
 import { coordSum } from "../util";
-import { shipAdjacentToOther } from "../game/logic";
+import { shipAdjacentToOther } from "../game/pre-game-logic";
 
 interface SeabattleState {
   started: boolean;
@@ -114,7 +114,9 @@ const useSeabattleStore = create<SeabattleState>()((set) => ({
       return updatedState;
     }),
   start: () =>
-    set((state) => ({ ...state, inTurn: state.playerHome, started: true })),
+    set((state) => {
+      return { ...state, inTurn: state.playerHome, started: true };
+    }),
   shootBoard: (id, coord) =>
     set((state) => {
       console.log("id:", id, coord);
