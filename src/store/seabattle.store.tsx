@@ -3,11 +3,20 @@ import { ICoord, IDragging, IPlayer, IShip } from "../types";
 import { createPlayer } from "./player";
 import { coordSum } from "../util";
 import { shipAdjacentToOther } from "../game/pre-game-logic";
+import {
+  canShoot,
+  changeTurn,
+  didGameEnd,
+  putSafeSquaresAroundShip,
+  shipHit,
+  updateBoard,
+  updateHitObject,
+} from "../game/game-logic";
 
 interface SeabattleState {
   started: boolean;
   ended: boolean;
-  inTurn: IPlayer | undefined;
+  inTurn: number | undefined;
   dragging: IDragging | undefined;
   playerHome: IPlayer;
   playerAway: IPlayer;
@@ -115,12 +124,81 @@ const useSeabattleStore = create<SeabattleState>()((set) => ({
     }),
   start: () =>
     set((state) => {
-      return { ...state, inTurn: state.playerHome, started: true };
+      return { ...state, inTurn: state.playerHome.playerId, started: true };
     }),
   shootBoard: (id, coord) =>
     set((state) => {
       console.log("id:", id, coord);
-      return state;
+      if (id !== state.inTurn || !state.started || state.ended) return state;
+
+      const currentPlayer = id === 1 ? state.playerHome : state.playerAway;
+      const opponentPlayer = id === 1 ? state.playerAway : state.playerHome;
+
+      if (!canShoot(currentPlayer.boardOpponent[coord.y][coord.x]))
+        return state;
+
+      let nextInTurn: number | undefined = state.inTurn;
+      let ended: boolean = state.ended;
+      let updatedShips = opponentPlayer.ships;
+      let lastHit = currentPlayer.lastHit;
+
+      let boardsUpdated = updateBoard(
+        opponentPlayer.board,
+        currentPlayer.boardOpponent,
+        coord
+      );
+
+      if (!boardsUpdated.hit) {
+        lastHit = {
+          ...lastHit,
+          miss: true,
+        };
+        nextInTurn = changeTurn(state.inTurn, currentPlayer, opponentPlayer);
+      } else {
+        lastHit = updateHitObject(lastHit, coord);
+        const { updatedShipsTemp, hitShipIndex } = shipHit(
+          coord,
+          opponentPlayer.ships
+        );
+
+        updatedShips = updatedShipsTemp;
+        if (
+          hitShipIndex !== -1 &&
+          updatedShips[hitShipIndex].hitSquares ===
+            updatedShips[hitShipIndex].length
+        ) {
+          lastHit = {};
+          console.log(
+            "Put safe around ship, updated board:",
+            boardsUpdated.opponent
+          );
+          boardsUpdated = putSafeSquaresAroundShip(
+            boardsUpdated,
+            updatedShips[hitShipIndex]
+          );
+          ended = didGameEnd(updatedShips);
+          if (ended) nextInTurn = undefined;
+        }
+      }
+
+      const updatedCurrentPlayer = {
+        ...currentPlayer,
+        boardOpponent: boardsUpdated.opponent,
+        lastHit: lastHit,
+      };
+      const udpatedOpponentPlayer = {
+        ...opponentPlayer,
+        board: boardsUpdated.currentPlayer,
+        ships: updatedShips,
+      };
+
+      return {
+        ...state,
+        inTurn: nextInTurn,
+        ended: ended,
+        playerHome: id === 1 ? updatedCurrentPlayer : udpatedOpponentPlayer,
+        playerAway: id === 1 ? udpatedOpponentPlayer : updatedCurrentPlayer,
+      };
     }),
 }));
 
