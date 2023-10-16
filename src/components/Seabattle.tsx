@@ -29,12 +29,10 @@ const Seabattle = () => {
           <button onClick={startGame}>Start game</button>
         </div>
       )}
-      {game.started && (
-        <div className="boards">
-          <Board type="mine" player={game.playerHome} />
-          <Board type="opponent" player={game.playerAway} />
-        </div>
-      )}
+      <div className="boards">
+        <Board type="mine" />
+        {game.started && <Board type="opponent" />}
+      </div>
     </div>
   );
 };

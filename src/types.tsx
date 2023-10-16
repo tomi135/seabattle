@@ -4,8 +4,11 @@ interface ICoord {
 }
 
 interface ILastHit {
+  start?: ICoord;
   hit?: ICoord;
   direction?: ICoord;
+  length?: number;
+  miss?: boolean;
 }
 
 interface IShip {
@@ -37,4 +40,10 @@ interface IPlayer {
   lastHit: ILastHit | null;
 }
 
-export type { ICoord, IDragging, IShip, IPlayer };
+interface IBoardsUpdated {
+  currentPlayer: number[][];
+  opponent: number[][];
+  hit: boolean;
+}
+
+export type { ICoord, ILastHit, IDragging, IShip, IPlayer, IBoardsUpdated };
