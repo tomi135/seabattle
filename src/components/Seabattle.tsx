@@ -1,9 +1,17 @@
+import { useEffect } from "react";
 import { useSeabattleStore } from "../store/seabattle.store";
 import Board from "./Board";
+import { PlayerType } from "../constants";
+import { AIshoot } from "../game/ai";
 
 const Seabattle = () => {
   const game = useSeabattleStore((state) => state);
 
+  useEffect(() => {
+    if (game.inTurn !== PlayerType.Computer) return;
+
+    AIshoot(game.playerAway, game.shootBoard);
+  }, [game]);
   const newGame = (e: React.MouseEvent) => {
     console.log("New game event:", e);
   };

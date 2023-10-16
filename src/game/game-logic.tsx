@@ -70,7 +70,8 @@ const shipHit = (coord: ICoord, ships: IShip[]) => {
 };
 
 const updateHitObject = (lastHit: ILastHit | null, coord: ICoord): ILastHit => {
-  if (!lastHit?.start) return { start: coord, hit: coord } as ILastHit;
+  if (!lastHit?.start)
+    return { start: coord, hit: coord, length: 1 } as ILastHit;
   lastHit = {
     start: lastHit.start,
     direction: {
