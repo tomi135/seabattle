@@ -7,8 +7,8 @@ import {
   canShoot,
   changeTurn,
   didGameEnd,
+  didShotHit,
   putSafeSquaresAroundShip,
-  shipHit,
   updateBoard,
   updateHitObject,
 } from "../game/game-logic";
@@ -20,6 +20,7 @@ interface SeabattleState {
   dragging: IDragging | undefined;
   playerHome: IPlayer;
   playerAway: IPlayer;
+  newGame: () => void;
   draggingStart: (n: number, c: ICoord) => void;
   draggingUpdate: (c: ICoord) => void;
   draggingEnd: () => void;
@@ -28,6 +29,18 @@ interface SeabattleState {
   shootBoard: (id: number, coord: ICoord) => void;
 }
 
+const newState = (state: SeabattleState) => {
+  return {
+    ...state,
+    started: false,
+    ended: false,
+    inTurn: undefined,
+    dragging: undefined,
+    playerHome: createPlayer(1, "Player1"),
+    playerAway: createPlayer(2, "Player2"),
+  };
+};
+
 const useSeabattleStore = create<SeabattleState>()((set) => ({
   started: false,
   ended: false,
@@ -35,6 +48,7 @@ const useSeabattleStore = create<SeabattleState>()((set) => ({
   dragging: undefined,
   playerHome: createPlayer(1, "Player1"),
   playerAway: createPlayer(2, "Player2"),
+  newGame: () => set((state) => newState(state)),
   draggingStart: (index, clickedCoord) =>
     set((state) => ({
       ...state,
@@ -124,7 +138,12 @@ const useSeabattleStore = create<SeabattleState>()((set) => ({
     }),
   start: () =>
     set((state) => {
-      return { ...state, inTurn: state.playerHome.playerId, started: true };
+      return {
+        ...state,
+        inTurn: state.playerHome.playerId,
+        started: true,
+        ended: false,
+      };
     }),
   shootBoard: (id, coord) =>
     set((state) => {
@@ -137,48 +156,41 @@ const useSeabattleStore = create<SeabattleState>()((set) => ({
       if (!canShoot(currentPlayer.boardOpponent[coord.y][coord.x]))
         return state;
 
+      console.log("Was able to shoot");
       let nextInTurn: number | undefined = state.inTurn;
       let ended: boolean = state.ended;
-      let updatedShips = opponentPlayer.ships;
       let lastHit = currentPlayer.lastHit;
 
+      // did it hit?
+      const shot = didShotHit(opponentPlayer.ships, coord);
+      // update boards
       let boardsUpdated = updateBoard(
         opponentPlayer.board,
         currentPlayer.boardOpponent,
-        coord
+        coord,
+        shot.hitShip
       );
+      console.log("Board updated: ", boardsUpdated.main);
 
-      if (!boardsUpdated.hit) {
+      if (shot.hitShip && !shot.hitShip.floating) {
+        boardsUpdated = putSafeSquaresAroundShip(boardsUpdated, shot.hitShip);
+      }
+
+      if (!shot.hitShip) {
         lastHit = {
           ...lastHit,
           miss: true,
         };
         nextInTurn = changeTurn(state.inTurn, currentPlayer, opponentPlayer);
       } else {
-        lastHit = updateHitObject(lastHit, coord);
-        const { updatedShipsTemp, hitShipIndex } = shipHit(
-          coord,
-          opponentPlayer.ships
-        );
-
-        updatedShips = updatedShipsTemp;
-        if (
-          hitShipIndex !== -1 &&
-          updatedShips[hitShipIndex].hitSquares ===
-            updatedShips[hitShipIndex].length
-        ) {
+        if (shot.hitShip.floating) {
+          lastHit = updateHitObject(lastHit, coord);
+        } else {
           lastHit = {};
-          console.log(
-            "Put safe around ship, updated board:",
-            boardsUpdated.opponent
-          );
-          boardsUpdated = putSafeSquaresAroundShip(
-            boardsUpdated,
-            updatedShips[hitShipIndex]
-          );
-          ended = didGameEnd(updatedShips);
-          if (ended) nextInTurn = undefined;
         }
+
+        ended = didGameEnd(shot.updatedShips);
+        if (ended) nextInTurn = undefined;
       }
 
       const updatedCurrentPlayer = {
@@ -188,8 +200,8 @@ const useSeabattleStore = create<SeabattleState>()((set) => ({
       };
       const udpatedOpponentPlayer = {
         ...opponentPlayer,
-        board: boardsUpdated.currentPlayer,
-        ships: updatedShips,
+        board: boardsUpdated.main,
+        ships: shot.updatedShips,
       };
 
       return {

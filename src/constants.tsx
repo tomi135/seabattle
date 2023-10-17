@@ -2,7 +2,7 @@ const CANVAS_SIZE = 500;
 const SQUARE_COUNT = 11;
 const SQUARE_WIDTH = CANVAS_SIZE / SQUARE_COUNT;
 const SQUARE_CENTER = SQUARE_WIDTH / 2;
-const AI_DELAY = 100;
+const AI_DELAY = 300;
 const HIDE_DEBUG = false;
 
 const CONSTANTS = {
@@ -31,6 +31,11 @@ const BoardValues = {
   Safe: 5,
 };
 
+const PlayerType = {
+  Human: 1,
+  Computer: 2,
+};
+
 const up = { x: 0, y: -1 }; // 0 - up
 const right = { x: 1, y: 0 }; // 1 - right
 const down = { x: 0, y: 1 }; // 2 - down
@@ -39,4 +44,4 @@ const none = { x: 0, y: 0 }; // 4 - stay put
 const direction = [up, right, down, left, none];
 
 // eslint-disable-next-line react-refresh/only-export-components
-export { CONSTANTS, MISC, ALPHABETS, BoardValues, direction };
+export { CONSTANTS, MISC, ALPHABETS, BoardValues, PlayerType, direction };

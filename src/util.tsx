@@ -32,6 +32,14 @@ const copyShip = (ship: IShip): IShip => {
   return newShip;
 };
 
+const copyBoard = (board: number[][]): number[][] => {
+  const boardCopy = [];
+  for (let i = 0; i < board.length; i++) {
+    boardCopy[i] = [...board[i]];
+  }
+  return boardCopy;
+};
+
 const getCoordinate = (
   canvas: HTMLCanvasElement,
   e: React.MouseEvent
@@ -70,6 +78,7 @@ export {
   coordSubtract,
   coordEqual,
   copyShip,
+  copyBoard,
   getCoordinate,
   outOfBounds,
 };
