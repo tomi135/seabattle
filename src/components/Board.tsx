@@ -126,16 +126,24 @@ const Board = ({ type }: IBoardProp) => {
           onMouseUp={handleMouseUp}
         />
       </div>
-      {!MISC.HIDE_DEBUG && (
+      {process.env.NODE_ENV !== "production" && !MISC.HIDE_DEBUG && (
         <div className="header">
           <ul>
-            {player.board.map((value, index) => (
-              <li key={index}>
-                {value.map((v, i) => (
-                  <span key={i}>&nbsp;{v}&nbsp;</span>
+            {type === "mine"
+              ? player.board.map((value, index) => (
+                  <li key={index}>
+                    {value.map((v, i) => (
+                      <span key={i}>&nbsp;{v}&nbsp;</span>
+                    ))}
+                  </li>
+                ))
+              : player.boardOpponent.map((value, index) => (
+                  <li key={index}>
+                    {value.map((v, i) => (
+                      <span key={i}>&nbsp;{v}&nbsp;</span>
+                    ))}
+                  </li>
                 ))}
-              </li>
-            ))}
           </ul>
         </div>
       )}
