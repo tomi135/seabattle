@@ -1,5 +1,13 @@
 import { BoardValues } from "../constants";
-import { IBoardsUpdated, ICoord, ILastHit, IPlayer, IShip } from "../types";
+import {
+  IBoardsUpdated,
+  ICoord,
+  IDidShotHit,
+  ILastHit,
+  IPlayer,
+  IShip,
+} from "../types";
+import { copyBoard } from "../util";
 
 const canShoot = (value: number) => {
   return (
@@ -9,35 +17,73 @@ const canShoot = (value: number) => {
   );
 };
 
-const didShotHit = (board: number[][], coord: ICoord) => {
-  return (
-    board[coord.y][coord.x] === BoardValues.ShipUnbombHidden ||
-    board[coord.y][coord.x] === BoardValues.ShipUnbombVisible
-  );
+const didShotHit = (ships: IShip[], coord: ICoord): IDidShotHit => {
+  let hitShip = null;
+  const updatedShips = ships.map((ship) => {
+    for (let i = 0; i < ship.length; i++) {
+      const nextX = ship.coordStart.x + i * ship.direction.x;
+      const nextY = ship.coordStart.y + i * ship.direction.y;
+      if (nextX === coord.x && nextY === coord.y) {
+        const updatedShip = { ...ship };
+        updatedShip.hitSquares += 1;
+        if (updatedShip.hitSquares === updatedShip.length) {
+          updatedShip.floating = false;
+        }
+        hitShip = updatedShip;
+        return updatedShip;
+      }
+    }
+    return ship;
+  });
+  return { updatedShips, hitShip };
+};
+
+const putSafeSquaresAroundShip = (
+  boards: IBoardsUpdated,
+  ship: IShip
+): IBoardsUpdated => {
+  // make a copy of boards
+  const boardCurrPlayer = copyBoard(boards.boardCurrPlayer);
+  const boardOpponent = copyBoard(boards.boardOpponent);
+
+  for (let i = 0; i < ship.length; i++) {
+    const shipCoordX = ship.coordStart.x + i * ship.direction.x;
+    const shipCoordY = ship.coordStart.y + i * ship.direction.y;
+    for (let j = -1; j <= 1; j++) {
+      for (let k = -1; k <= 1; k++) {
+        const coordX = shipCoordX + k;
+        const coordY = shipCoordY + j;
+        if (coordX < 0 || 9 < coordX || coordY < 0 || 9 < coordY) continue;
+        if (boardCurrPlayer[coordY][coordX] === BoardValues.Empty) {
+          boardCurrPlayer[coordY][coordX] = BoardValues.Safe;
+          boardOpponent[coordY][coordX] = BoardValues.Safe;
+        }
+      }
+    }
+  }
+  return { boardCurrPlayer, boardOpponent };
 };
 
 const updateBoard = (
   boardPlayer: number[][],
   boardOpponent: number[][],
   coord: ICoord
-) => {
-  let hit = false;
-  const currentPlayer = [];
+): IBoardsUpdated => {
+  const boardCurrPlayer = [];
   const opponent = [];
   for (let i = 0; i < boardPlayer.length; i++) {
-    currentPlayer[i] = [...boardPlayer[i]];
+    boardCurrPlayer[i] = [...boardPlayer[i]];
     opponent[i] = [...boardOpponent[i]];
     if (i === coord.y) {
       //updatedBoard[i][x] = value;
       switch (boardPlayer[coord.y][coord.x]) {
         case BoardValues.Empty:
-          currentPlayer[coord.y][coord.x] = BoardValues.ShotMissed;
+          boardCurrPlayer[coord.y][coord.x] = BoardValues.ShotMissed;
           opponent[coord.y][coord.x] = BoardValues.ShotMissed;
           break;
         case BoardValues.ShipUnbombVisible:
         case BoardValues.ShipUnbombHidden:
-          hit = true;
-          currentPlayer[coord.y][coord.x] = BoardValues.ShipBombed;
+          boardCurrPlayer[coord.y][coord.x] = BoardValues.ShipBombed;
           opponent[coord.y][coord.x] = BoardValues.ShipBombed;
           break;
         default:
@@ -46,28 +92,28 @@ const updateBoard = (
     }
   }
   console.log("Updated board: ", boardPlayer);
-  return { currentPlayer, opponent, hit };
+  return { boardCurrPlayer, boardOpponent };
 };
 
-const shipHit = (coord: ICoord, ships: IShip[]) => {
-  let hitShipIndex = -1;
-  const updatedShipsTemp = ships.map((ship) => {
-    for (let i = 0; i < ship.length; i++) {
-      const nextX = ship.coordStart.x + i * ship.direction.x;
-      const nextY = ship.coordStart.y + i * ship.direction.y;
-      if (nextX === coord.x && nextY === coord.y) {
-        const updatedShip = { ...ship };
-        updatedShip.hitSquares += 1;
-        if (updatedShip.hitSquares === updatedShip.length)
-          updatedShip.floating = false;
-        hitShipIndex = i;
-        return updatedShip;
-      }
-    }
-    return ship;
-  });
-  return { updatedShipsTemp, hitShipIndex };
-};
+// const shipHit = (coord: ICoord, ships: IShip[]) => {
+//   let hitShipIndex = -1;
+//   const updatedShipsTemp = ships.map((ship) => {
+//     for (let i = 0; i < ship.length; i++) {
+//       const nextX = ship.coordStart.x + i * ship.direction.x;
+//       const nextY = ship.coordStart.y + i * ship.direction.y;
+//       if (nextX === coord.x && nextY === coord.y) {
+//         const updatedShip = { ...ship };
+//         updatedShip.hitSquares += 1;
+//         if (updatedShip.hitSquares === updatedShip.length)
+//           updatedShip.floating = false;
+//         hitShipIndex = i;
+//         return updatedShip;
+//       }
+//     }
+//     return ship;
+//   });
+//   return { updatedShipsTemp, hitShipIndex };
+// };
 
 const updateHitObject = (lastHit: ILastHit | null, coord: ICoord): ILastHit => {
   if (!lastHit?.start)
@@ -92,31 +138,6 @@ const updateHitObject = (lastHit: ILastHit | null, coord: ICoord): ILastHit => {
   return lastHit as ILastHit;
 };
 
-const putSafeSquaresAroundShip = (boards: IBoardsUpdated, ship: IShip) => {
-  // make a copy of boards
-  const updatedBoards = updateBoard(boards.currentPlayer, boards.opponent, {
-    x: -1,
-    y: -1,
-  });
-
-  for (let i = 0; i < ship.length; i++) {
-    const shipCoordX = ship.coordStart.x + i * ship.direction.x;
-    const shipCoordY = ship.coordStart.y + i * ship.direction.y;
-    for (let j = -1; j <= 1; j++) {
-      for (let k = -1; k <= 1; k++) {
-        const coordX = shipCoordX + k;
-        const coordY = shipCoordY + j;
-        if (coordX < 0 || 9 < coordX || coordY < 0 || 9 < coordY) continue;
-        if (boards.currentPlayer[coordY][coordX] === BoardValues.Empty) {
-          updatedBoards.currentPlayer[coordY][coordX] = BoardValues.Safe;
-          updatedBoards.opponent[coordY][coordX] = BoardValues.Safe;
-        }
-      }
-    }
-  }
-  return updatedBoards;
-};
-
 const didGameEnd = (ships: IShip[]) => {
   for (let i = 0; i < ships.length; i++) {
     if (ships[i].hitSquares !== ships[i].length) return false;
@@ -135,7 +156,6 @@ const changeTurn = (
 export {
   canShoot,
   didShotHit,
-  shipHit,
   updateBoard,
   updateHitObject,
   putSafeSquaresAroundShip,

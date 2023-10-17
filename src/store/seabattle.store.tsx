@@ -7,8 +7,8 @@ import {
   canShoot,
   changeTurn,
   didGameEnd,
+  didShotHit,
   putSafeSquaresAroundShip,
-  shipHit,
   updateBoard,
   updateHitObject,
 } from "../game/game-logic";
@@ -137,18 +137,25 @@ const useSeabattleStore = create<SeabattleState>()((set) => ({
       if (!canShoot(currentPlayer.boardOpponent[coord.y][coord.x]))
         return state;
 
+      console.log("Was able to shoot");
       let nextInTurn: number | undefined = state.inTurn;
       let ended: boolean = state.ended;
-      let updatedShips = opponentPlayer.ships;
       let lastHit = currentPlayer.lastHit;
 
+      // did it hit?
+      const shot = didShotHit(opponentPlayer.ships, coord);
+      // update boards
       let boardsUpdated = updateBoard(
         opponentPlayer.board,
         currentPlayer.boardOpponent,
         coord
       );
 
-      if (!boardsUpdated.hit) {
+      if (shot.hitShip && !shot.hitShip.floating) {
+        boardsUpdated = putSafeSquaresAroundShip(boardsUpdated, shot.hitShip);
+      }
+
+      if (!shot.hitShip) {
         lastHit = {
           ...lastHit,
           miss: true,
@@ -156,40 +163,20 @@ const useSeabattleStore = create<SeabattleState>()((set) => ({
         nextInTurn = changeTurn(state.inTurn, currentPlayer, opponentPlayer);
       } else {
         lastHit = updateHitObject(lastHit, coord);
-        const { updatedShipsTemp, hitShipIndex } = shipHit(
-          coord,
-          opponentPlayer.ships
-        );
 
-        updatedShips = updatedShipsTemp;
-        if (
-          hitShipIndex !== -1 &&
-          updatedShips[hitShipIndex].hitSquares ===
-            updatedShips[hitShipIndex].length
-        ) {
-          lastHit = {};
-          console.log(
-            "Put safe around ship, updated board:",
-            boardsUpdated.opponent
-          );
-          boardsUpdated = putSafeSquaresAroundShip(
-            boardsUpdated,
-            updatedShips[hitShipIndex]
-          );
-          ended = didGameEnd(updatedShips);
-          if (ended) nextInTurn = undefined;
-        }
+        ended = didGameEnd(shot.updatedShips);
+        if (ended) nextInTurn = undefined;
       }
 
       const updatedCurrentPlayer = {
         ...currentPlayer,
-        boardOpponent: boardsUpdated.opponent,
+        boardOpponent: boardsUpdated.boardOpponent,
         lastHit: lastHit,
       };
       const udpatedOpponentPlayer = {
         ...opponentPlayer,
-        board: boardsUpdated.currentPlayer,
-        ships: updatedShips,
+        board: boardsUpdated.boardCurrPlayer,
+        ships: shot.updatedShips,
       };
 
       return {
