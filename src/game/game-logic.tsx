@@ -95,26 +95,6 @@ const updateBoard = (
   return { boardCurrPlayer, boardOpponent };
 };
 
-// const shipHit = (coord: ICoord, ships: IShip[]) => {
-//   let hitShipIndex = -1;
-//   const updatedShipsTemp = ships.map((ship) => {
-//     for (let i = 0; i < ship.length; i++) {
-//       const nextX = ship.coordStart.x + i * ship.direction.x;
-//       const nextY = ship.coordStart.y + i * ship.direction.y;
-//       if (nextX === coord.x && nextY === coord.y) {
-//         const updatedShip = { ...ship };
-//         updatedShip.hitSquares += 1;
-//         if (updatedShip.hitSquares === updatedShip.length)
-//           updatedShip.floating = false;
-//         hitShipIndex = i;
-//         return updatedShip;
-//       }
-//     }
-//     return ship;
-//   });
-//   return { updatedShipsTemp, hitShipIndex };
-// };
-
 const updateHitObject = (lastHit: ILastHit | null, coord: ICoord): ILastHit => {
   if (!lastHit?.start)
     return { start: coord, hit: coord, length: 1 } as ILastHit;
