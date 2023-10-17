@@ -12,9 +12,12 @@ const Seabattle = () => {
 
     AIshoot(game.playerAway, game.shootBoard);
   }, [game]);
+
   const newGame = (e: React.MouseEvent) => {
     console.log("New game event:", e);
+    game.newGame();
   };
+
   const startGame = (e: React.MouseEvent) => {
     console.log("Startgame event:", e);
     game.start();

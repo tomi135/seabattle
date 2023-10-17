@@ -43,8 +43,8 @@ const putSafeSquaresAroundShip = (
   ship: IShip
 ): IBoardsUpdated => {
   // make a copy of boards
-  const boardCurrPlayer = copyBoard(boards.boardCurrPlayer);
-  const boardOpponent = copyBoard(boards.boardOpponent);
+  const boardCurrPlayer = copyBoard(boards.main);
+  const boardOpponent = copyBoard(boards.opponent);
 
   for (let i = 0; i < ship.length; i++) {
     const shipCoordX = ship.coordStart.x + i * ship.direction.x;
@@ -61,38 +61,33 @@ const putSafeSquaresAroundShip = (
       }
     }
   }
-  return { boardCurrPlayer, boardOpponent };
+  return { main: boardCurrPlayer, opponent: boardOpponent };
 };
 
 const updateBoard = (
-  boardPlayer: number[][],
+  boardMain: number[][],
   boardOpponent: number[][],
-  coord: ICoord
+  coord: ICoord,
+  hitShip: IShip | null
 ): IBoardsUpdated => {
-  const boardCurrPlayer = [];
+  const main = [];
   const opponent = [];
-  for (let i = 0; i < boardPlayer.length; i++) {
-    boardCurrPlayer[i] = [...boardPlayer[i]];
+  for (let i = 0; i < boardMain.length; i++) {
+    main[i] = [...boardMain[i]];
     opponent[i] = [...boardOpponent[i]];
     if (i === coord.y) {
       //updatedBoard[i][x] = value;
-      switch (boardPlayer[coord.y][coord.x]) {
-        case BoardValues.Empty:
-          boardCurrPlayer[coord.y][coord.x] = BoardValues.ShotMissed;
-          opponent[coord.y][coord.x] = BoardValues.ShotMissed;
-          break;
-        case BoardValues.ShipUnbombVisible:
-        case BoardValues.ShipUnbombHidden:
-          boardCurrPlayer[coord.y][coord.x] = BoardValues.ShipBombed;
-          opponent[coord.y][coord.x] = BoardValues.ShipBombed;
-          break;
-        default:
-          break;
+      if (hitShip) {
+        main[coord.y][coord.x] = BoardValues.ShipBombed;
+        opponent[coord.y][coord.x] = BoardValues.ShipBombed;
+      } else {
+        main[coord.y][coord.x] = BoardValues.ShotMissed;
+        opponent[coord.y][coord.x] = BoardValues.ShotMissed;
       }
     }
   }
-  console.log("Updated board: ", boardPlayer);
-  return { boardCurrPlayer, boardOpponent };
+  console.log("Updated board: ", opponent);
+  return { main, opponent };
 };
 
 const updateHitObject = (lastHit: ILastHit | null, coord: ICoord): ILastHit => {

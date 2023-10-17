@@ -27,7 +27,10 @@ const Board = ({ type }: IBoardProp) => {
     if (!context) return;
     const board =
       type === "mine" ? state.playerHome.board : state.playerHome.boardOpponent;
-    const ships = type === "mine" ? state.playerHome.ships : [];
+    const ships =
+      type === "mine"
+        ? state.playerHome.ships
+        : state.playerAway.ships.filter((ship) => !ship.floating);
     drawSeabattle(context, board, ships);
   }, [state, type]);
 

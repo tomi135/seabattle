@@ -20,6 +20,7 @@ interface SeabattleState {
   dragging: IDragging | undefined;
   playerHome: IPlayer;
   playerAway: IPlayer;
+  newGame: () => void;
   draggingStart: (n: number, c: ICoord) => void;
   draggingUpdate: (c: ICoord) => void;
   draggingEnd: () => void;
@@ -28,6 +29,18 @@ interface SeabattleState {
   shootBoard: (id: number, coord: ICoord) => void;
 }
 
+const newState = (state: SeabattleState) => {
+  return {
+    ...state,
+    started: false,
+    ended: false,
+    inTurn: undefined,
+    dragging: undefined,
+    playerHome: createPlayer(1, "Player1"),
+    playerAway: createPlayer(2, "Player2"),
+  };
+};
+
 const useSeabattleStore = create<SeabattleState>()((set) => ({
   started: false,
   ended: false,
@@ -35,6 +48,7 @@ const useSeabattleStore = create<SeabattleState>()((set) => ({
   dragging: undefined,
   playerHome: createPlayer(1, "Player1"),
   playerAway: createPlayer(2, "Player2"),
+  newGame: () => set((state) => newState(state)),
   draggingStart: (index, clickedCoord) =>
     set((state) => ({
       ...state,
@@ -124,7 +138,12 @@ const useSeabattleStore = create<SeabattleState>()((set) => ({
     }),
   start: () =>
     set((state) => {
-      return { ...state, inTurn: state.playerHome.playerId, started: true };
+      return {
+        ...state,
+        inTurn: state.playerHome.playerId,
+        started: true,
+        ended: false,
+      };
     }),
   shootBoard: (id, coord) =>
     set((state) => {
@@ -148,8 +167,10 @@ const useSeabattleStore = create<SeabattleState>()((set) => ({
       let boardsUpdated = updateBoard(
         opponentPlayer.board,
         currentPlayer.boardOpponent,
-        coord
+        coord,
+        shot.hitShip
       );
+      console.log("Board updated: ", boardsUpdated.main);
 
       if (shot.hitShip && !shot.hitShip.floating) {
         boardsUpdated = putSafeSquaresAroundShip(boardsUpdated, shot.hitShip);
@@ -162,7 +183,11 @@ const useSeabattleStore = create<SeabattleState>()((set) => ({
         };
         nextInTurn = changeTurn(state.inTurn, currentPlayer, opponentPlayer);
       } else {
-        lastHit = updateHitObject(lastHit, coord);
+        if (shot.hitShip.floating) {
+          lastHit = updateHitObject(lastHit, coord);
+        } else {
+          lastHit = {};
+        }
 
         ended = didGameEnd(shot.updatedShips);
         if (ended) nextInTurn = undefined;
@@ -170,12 +195,12 @@ const useSeabattleStore = create<SeabattleState>()((set) => ({
 
       const updatedCurrentPlayer = {
         ...currentPlayer,
-        boardOpponent: boardsUpdated.boardOpponent,
+        boardOpponent: boardsUpdated.opponent,
         lastHit: lastHit,
       };
       const udpatedOpponentPlayer = {
         ...opponentPlayer,
-        board: boardsUpdated.boardCurrPlayer,
+        board: boardsUpdated.main,
         ships: shot.updatedShips,
       };
 

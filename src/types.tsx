@@ -41,8 +41,8 @@ interface IPlayer {
 }
 
 interface IBoardsUpdated {
-  boardCurrPlayer: number[][];
-  boardOpponent: number[][];
+  main: number[][];
+  opponent: number[][];
 }
 
 interface IDidShotHit {

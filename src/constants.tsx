@@ -2,7 +2,7 @@ const CANVAS_SIZE = 500;
 const SQUARE_COUNT = 11;
 const SQUARE_WIDTH = CANVAS_SIZE / SQUARE_COUNT;
 const SQUARE_CENTER = SQUARE_WIDTH / 2;
-const AI_DELAY = 100;
+const AI_DELAY = 300;
 const HIDE_DEBUG = false;
 
 const CONSTANTS = {
