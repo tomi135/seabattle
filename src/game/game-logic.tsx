@@ -86,7 +86,6 @@ const updateBoard = (
       }
     }
   }
-  console.log("Updated board: ", opponent);
   return { main, opponent };
 };
 

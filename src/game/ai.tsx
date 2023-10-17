@@ -89,8 +89,6 @@ const AIshoot = (
 
   const shoot = async (id: number, coord: ICoord) => {
     await delay(MISC.AI_DELAY);
-
-    console.log("Computer shoots: ", coord);
     callback(id, coord);
   };
 

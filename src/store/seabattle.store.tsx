@@ -156,7 +156,6 @@ const useSeabattleStore = create<SeabattleState>()((set) => ({
       if (!canShoot(currentPlayer.boardOpponent[coord.y][coord.x]))
         return state;
 
-      console.log("Was able to shoot");
       let nextInTurn: number | undefined = state.inTurn;
       let ended: boolean = state.ended;
       let lastHit = currentPlayer.lastHit;
@@ -170,7 +169,6 @@ const useSeabattleStore = create<SeabattleState>()((set) => ({
         coord,
         shot.hitShip
       );
-      console.log("Board updated: ", boardsUpdated.main);
 
       if (shot.hitShip && !shot.hitShip.floating) {
         boardsUpdated = putSafeSquaresAroundShip(boardsUpdated, shot.hitShip);

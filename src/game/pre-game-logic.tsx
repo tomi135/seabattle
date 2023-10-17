@@ -137,8 +137,6 @@ const shipOutOfBounds = (currCoord: ICoord, dragging: IDragging): boolean => {
   const deltaX = currCoord.x - dragging.coordClick.x;
   const deltaY = currCoord.y - dragging.coordClick.y;
 
-  console.log(`start.x + deltaX = ${deltaX}`);
-  console.log(`start.y + deltaY = ${deltaY}`);
   if (
     dragging.originalCoordStart.x + deltaX < 0 ||
     9 < dragging.originalCoordStart.x + deltaX ||
@@ -149,7 +147,6 @@ const shipOutOfBounds = (currCoord: ICoord, dragging: IDragging): boolean => {
     dragging.originalCoordEnd.y + deltaY < 0 ||
     9 < dragging.originalCoordEnd.y + deltaY
   ) {
-    console.log("Out of bounds");
     return true;
   }
 

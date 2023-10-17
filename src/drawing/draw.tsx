@@ -74,7 +74,6 @@ const drawShips = (ctx: CanvasRenderingContext2D, ships: IShip[]) => {
   ctx.lineWidth = 5;
   ctx.lineCap = "butt";
 
-  console.log("Ships:", ships);
   for (const ship of ships) {
     if (ship.acceptable) {
       ctx.strokeStyle = ship.floating ? "blue" : "red";
