@@ -41,9 +41,21 @@ interface IPlayer {
 }
 
 interface IBoardsUpdated {
-  currentPlayer: number[][];
-  opponent: number[][];
-  hit: boolean;
+  boardCurrPlayer: number[][];
+  boardOpponent: number[][];
 }
 
-export type { ICoord, ILastHit, IDragging, IShip, IPlayer, IBoardsUpdated };
+interface IDidShotHit {
+  updatedShips: IShip[];
+  hitShip: IShip | null;
+}
+
+export type {
+  ICoord,
+  ILastHit,
+  IDragging,
+  IShip,
+  IPlayer,
+  IBoardsUpdated,
+  IDidShotHit,
+};
