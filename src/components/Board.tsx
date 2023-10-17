@@ -57,7 +57,6 @@ const Board = ({ type }: IBoardProp) => {
     if (player.playerType !== "human") return;
 
     const shipIndex = getShipIndexFromSquare(clickedCoord, player.ships);
-    console.log("Square contains ship:", shipIndex);
     if (shipIndex < 0) return;
 
     state.draggingStart(shipIndex, clickedCoord);
@@ -81,7 +80,6 @@ const Board = ({ type }: IBoardProp) => {
       state.dragging.coordDelta.x !== delta.x ||
       state.dragging.coordDelta.y !== delta.y
     ) {
-      console.log("Delta:", delta);
       if (shipOutOfBounds(currCoord, state.dragging)) return;
 
       state.draggingUpdate(delta);
