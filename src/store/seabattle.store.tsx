@@ -138,10 +138,20 @@ const useSeabattleStore = create<SeabattleState>()((set) => ({
     }),
   start: () =>
     set((state) => {
+      let canStart = false;
+      if (
+        state.playerHome.ships.filter((ship) => ship.acceptable === false)
+          .length === 0
+      )
+        canStart = true;
+      if (!canStart) {
+        console.log("Can not start...");
+        return state;
+      }
       return {
         ...state,
         inTurn: state.playerHome.playerId,
-        started: true,
+        started: canStart,
         ended: false,
       };
     }),
