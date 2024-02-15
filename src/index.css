@@ -6,7 +6,7 @@
   font-weight: 400;
  
   color-scheme: light dark;
-  color: rgba(115, 224, 94, 0.87);
+  color: rgb(51, 158, 32);
   background-color: #242424;
 
   font-synthesis: none;
@@ -123,7 +123,7 @@ ul {
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
-    background-color: #56a92f;
+    background-color: rgb(51, 158, 32);
   }
   a:hover {
     color: #747bff;
