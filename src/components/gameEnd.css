@@ -1,0 +1,31 @@
+.end-container {
+  position: absolute;
+  margin: auto;
+  
+  width: 100%;
+  
+}
+
+.ended {
+  width: 40em;
+  margin: auto;
+  padding-left: 2em;
+  padding-right: 2em;
+  padding-top: 0.3em;
+  padding-bottom: 0.3em;
+  background-color: rgba(74, 198, 200, 0.5);
+  border-radius: 20px;
+  text-align: center;
+}
+
+.ended > button {
+  margin: 0em 1em 1em 1em;
+  padding: 1em;
+  font-size: 2em
+}
+
+.ended p {
+  font-size: 2em;
+  font-weight: bolder;
+  color: white;
+}

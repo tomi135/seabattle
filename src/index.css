@@ -86,28 +86,7 @@ ul {
   margin: 1em;
 }
 
-.end-container {
-  position: absolute;
-  margin: auto;
-  
-  width: 100%;
-  
-}
 
-.ended {
-  width: 20em;
-  margin: auto;
-  padding: 2em;
-  background-color: rgba(123, 234, 236, 0.5);
-  border-radius: 20px;
-  text-align: center;
-}
-
-.ended > button {
-  margin: 0em 1em 2em 1em;
-  padding: 1em;
-  font-size: 2em
-}
 
 .boards {
   display: grid;

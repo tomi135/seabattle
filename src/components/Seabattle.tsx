@@ -3,6 +3,7 @@ import { useSeabattleStore } from "../store/seabattle.store";
 import Board from "./Board";
 import { PlayerType } from "../constants";
 import { AIshoot } from "../game/ai";
+import GameEnd from "./GameEnd";
 
 const Seabattle = () => {
   const game = useSeabattleStore((state) => state);
@@ -13,10 +14,6 @@ const Seabattle = () => {
     AIshoot(game.playerAway, game.shootBoard);
   }, [game]);
 
-  const newGame = () => {
-    game.newGame();
-  };
-
   const startGame = () => {
     game.start();
   };
@@ -24,14 +21,7 @@ const Seabattle = () => {
   return (
     <div className="seabattle">
       <h1>Seabattle</h1>
-      {game.ended && (
-        <div className="end-container">
-          <div className="ended">
-            <h2>Game end</h2>
-            <button onClick={newGame}>New game</button>
-          </div>
-        </div>
-      )}
+      {game.ended && <GameEnd />}
       {!game.started && (
         <div className="start-view">
           <p>This is seabattle</p>

@@ -16,6 +16,7 @@ import {
 interface SeabattleState {
   started: boolean;
   ended: boolean;
+  winner: "you" | "computer" | "";
   inTurn: number | undefined;
   dragging: IDragging | undefined;
   playerHome: IPlayer;
@@ -44,6 +45,7 @@ const newState = (state: SeabattleState) => {
 const useSeabattleStore = create<SeabattleState>()((set) => ({
   started: false,
   ended: false,
+  winner: "",
   inTurn: undefined,
   dragging: undefined,
   playerHome: createPlayer(1, "Player1"),
@@ -198,7 +200,10 @@ const useSeabattleStore = create<SeabattleState>()((set) => ({
         }
 
         ended = didGameEnd(shot.updatedShips);
-        if (ended) nextInTurn = undefined;
+        if (ended) {
+          state.winner = state.inTurn === 1 ? "you" : "computer";
+          nextInTurn = undefined;
+        }
       }
 
       const updatedCurrentPlayer = {
