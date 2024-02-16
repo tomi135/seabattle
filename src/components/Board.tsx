@@ -113,7 +113,6 @@ const Board = ({ type }: IBoardProp) => {
             Clicked {clicked}
           </>
         )}
-        <p className="player-name">{player.name}</p>
       </div>
       <div className="canvas-container">
         <canvas
