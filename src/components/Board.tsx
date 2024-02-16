@@ -30,6 +30,8 @@ const Board = ({ type }: IBoardProp) => {
     const ships =
       type === "mine"
         ? state.playerHome.ships
+        : state.ended
+        ? state.playerAway.ships // if game ended draw all opponent ships
         : state.playerAway.ships.filter((ship) => !ship.floating);
     drawSeabattle(context, board, ships);
   }, [state, type]);
