@@ -1,4 +1,3 @@
-//import "./gameEnd.css";
 import { useSeabattleStore } from "../store/seabattle.store";
 
 const GameEnd = () => {
