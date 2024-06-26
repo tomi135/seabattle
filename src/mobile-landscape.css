@@ -1,0 +1,75 @@
+/* landscape */
+@media screen and (min-aspect-ratio: 13/9) and (pointer: coarse) {
+  h1 {
+    margin: 1em 0em;
+    font-size: 2em;
+    line-height: 1.1;
+    text-align: center;
+    color: white
+  }
+
+  .start-view {
+    text-align: center;
+    padding: 0.2em 0em;
+    margin: 0.1em 0em;
+  }
+
+  .start-button, .end-button {
+    margin: 1em;
+    padding: 1em;
+    background-color: rgb(107, 107, 107);
+    color: white;
+    font-size: 1.2em;
+    border-radius: 10px;
+  }
+
+  .seabattle {
+    min-width: 100vw;
+  }
+
+  .boards {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+  }
+
+  .board {
+    display: flex;
+  }
+  
+  .canvas-container {
+    display: flex;
+    flex: 1 1 auto;
+    width: 100vh;
+    height: 100vh;
+    margin: 0;
+  }
+
+  .end-container {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    
+    width: 50vw;
+    height: 100vh;
+
+  }
+  
+  .ended {
+    width: 80%;
+    height: 80%;
+    padding: 0 1em;
+    background-color: rgba(74, 198, 200, 0.5);
+    border-radius: 20px;
+    text-align: center;
+  }
+  
+  .ended p {
+    font-size: 2em;
+    font-weight: bolder;
+    color: black;
+  }
+
+}

@@ -1,4 +1,3 @@
-import "./gameEnd.css";
 import { useSeabattleStore } from "../store/seabattle.store";
 
 const GameEnd = () => {
@@ -11,8 +10,10 @@ const GameEnd = () => {
   return (
     <div className="end-container">
       <div className="ended">
-        <p>Game end, {game.winner} win the game!</p>
-        <button onClick={newGame}>New game</button>
+        <p>Game end, {game.winner} win!</p>
+        <button className="end-button" onClick={newGame}>
+          New game
+        </button>
       </div>
     </div>
   );

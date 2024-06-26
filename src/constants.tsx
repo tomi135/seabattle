@@ -3,7 +3,7 @@ const SQUARE_COUNT = 11;
 const SQUARE_WIDTH = CANVAS_SIZE / SQUARE_COUNT;
 const SQUARE_CENTER = SQUARE_WIDTH / 2;
 const AI_DELAY = 300;
-const HIDE_DEBUG = false;
+const HIDE_DEBUG = true;
 
 const CONSTANTS = {
   CANVAS_SIZE: CANVAS_SIZE,
@@ -21,6 +21,18 @@ const MISC = {
 } as const;
 
 const ALPHABETS = ["", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
+
+const CSS = {
+  SHIP_FLOATING_STROKE: "blue",
+  SHIP_FLOATING_FILL: "rgba(0, 255, 255, 0.3)",
+  SHIP_SUNKEN_STROKE: "red",
+  SHIP_SUNKEN_FILL: "rgba(255, 0,0,0.3)",
+  SHIP_NOT_ACCEPTABLE_STROKE: "brown",
+  SHIP_NOT_ACCEPTABLE_FILL: "rgba(166, 145, 92, 0.3)",
+  CIRCLE: "blue",
+  CROSS: "red",
+  SAFE: "gray",
+};
 
 const BoardValues = {
   Empty: 0,
@@ -44,4 +56,4 @@ const none = { x: 0, y: 0 }; // 4 - stay put
 const direction = [up, right, down, left, none];
 
 // eslint-disable-next-line react-refresh/only-export-components
-export { CONSTANTS, MISC, ALPHABETS, BoardValues, PlayerType, direction };
+export { CONSTANTS, MISC, ALPHABETS, CSS, BoardValues, PlayerType, direction };

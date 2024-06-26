@@ -105,15 +105,6 @@ const Board = ({ type }: IBoardProp) => {
 
   return (
     <div className="board">
-      <div className="header">
-        {process.env.NODE_ENV !== "production" && !MISC.HIDE_DEBUG && (
-          <>
-            Square: {square}
-            <br />
-            Clicked {clicked}
-          </>
-        )}
-      </div>
       <div className="canvas-container">
         <canvas
           width={CONSTANTS.CANVAS_SIZE + CONSTANTS.CANVAS_PADDING}
@@ -127,6 +118,9 @@ const Board = ({ type }: IBoardProp) => {
       </div>
       {process.env.NODE_ENV !== "production" && !MISC.HIDE_DEBUG && (
         <div className="header">
+          Square: {square}
+          <br />
+          Clicked {clicked}
           <ul>
             {type === "mine"
               ? player.board.map((value, index) => (
