@@ -1,4 +1,4 @@
-import { ALPHABETS, BoardValues, CONSTANTS } from "../constants";
+import { ALPHABETS, BoardValues, CONSTANTS, CSS } from "../constants";
 import { IShip } from "../types";
 
 const drawBoard = (ctx: CanvasRenderingContext2D) => {
@@ -76,13 +76,15 @@ const drawShips = (ctx: CanvasRenderingContext2D, ships: IShip[]) => {
 
   for (const ship of ships) {
     if (ship.acceptable) {
-      ctx.strokeStyle = ship.floating ? "blue" : "red";
+      ctx.strokeStyle = ship.floating
+        ? CSS.SHIP_FLOATING_STROKE
+        : CSS.SHIP_SUNKEN_STROKE;
       ctx.fillStyle = ship.floating
-        ? "rgba(0, 255, 255, 0.3)"
-        : "rgba(255, 0,0,0.3)";
+        ? CSS.SHIP_FLOATING_FILL
+        : CSS.SHIP_SUNKEN_FILL;
     } else {
-      ctx.strokeStyle = "brown";
-      ctx.fillStyle = "rgba(166, 145, 92, 0.3)";
+      ctx.strokeStyle = CSS.SHIP_NOT_ACCEPTABLE_STROKE;
+      ctx.fillStyle = CSS.SHIP_NOT_ACCEPTABLE_FILL;
     }
     let startX = CONSTANTS.SQUARE_WIDTH * (ship.coordStart.x + 1);
     let startY = CONSTANTS.SQUARE_WIDTH * (ship.coordStart.y + 1);
@@ -107,7 +109,7 @@ const drawShips = (ctx: CanvasRenderingContext2D, ships: IShip[]) => {
 const drawCross = (ctx: CanvasRenderingContext2D, x: number, y: number) => {
   const emptySpace = 0.2;
   ctx.lineWidth = 5;
-  ctx.strokeStyle = "red";
+  ctx.strokeStyle = CSS.CROSS;
   ctx.lineCap = "round";
   ctx.beginPath();
   ctx.moveTo(
@@ -135,8 +137,8 @@ const drawCross = (ctx: CanvasRenderingContext2D, x: number, y: number) => {
 const drawCircle = (ctx: CanvasRenderingContext2D, x: number, y: number) => {
   const size = 0.15;
   ctx.lineWidth = 0;
-  ctx.fillStyle = "blue";
-  ctx.strokeStyle = "blue";
+  ctx.fillStyle = CSS.CIRCLE;
+  ctx.strokeStyle = CSS.CIRCLE;
   ctx.beginPath();
   ctx.arc(
     CONSTANTS.SQUARE_WIDTH * (x + 1) + CONSTANTS.SQUARE_CENTER,
@@ -151,8 +153,8 @@ const drawCircle = (ctx: CanvasRenderingContext2D, x: number, y: number) => {
 
 const drawSafe = (ctx: CanvasRenderingContext2D, x: number, y: number) => {
   const size = 0.1;
-  ctx.fillStyle = "gray";
-  ctx.strokeStyle = "gray";
+  ctx.fillStyle = CSS.SAFE;
+  ctx.strokeStyle = CSS.SAFE;
   ctx.beginPath();
   ctx.arc(
     CONSTANTS.SQUARE_WIDTH * (x + 1) + CONSTANTS.SQUARE_CENTER,

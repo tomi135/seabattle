@@ -7,10 +7,10 @@
 }
 
 .ended {
-  width: 40em;
+  width: 90vw;
   margin: auto;
-  padding-left: 2em;
-  padding-right: 2em;
+  padding-left: 1em;
+  padding-right: 1em;
   padding-top: 0.3em;
   padding-bottom: 0.3em;
   background-color: rgba(74, 198, 200, 0.5);
@@ -27,5 +27,5 @@
 .ended p {
   font-size: 2em;
   font-weight: bolder;
-  color: white;
+  color: black;
 }

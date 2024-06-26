@@ -19,20 +19,25 @@ const Seabattle = () => {
   };
 
   return (
-    <div className="seabattle">
-      <h1>Seabattle</h1>
+    <>
       {game.ended && <GameEnd />}
-      {!game.started && (
-        <div className="start-view">
-          <p>This is seabattle</p>
-          <button onClick={startGame}>Start game</button>
+      <div className="seabattle">
+        {/* !game.started && <h1>Seabattle</h1> */}
+
+        <div className="boards">
+          {!game.started && (
+            <div className="start-view">
+              <h1>This is seabattle</h1>
+              <button className="start-button" onClick={startGame}>
+                Start game
+              </button>
+            </div>
+          )}
+          <Board type="mine" />
+          {game.started && <Board type="opponent" />}
         </div>
-      )}
-      <div className="boards">
-        <Board type="mine" />
-        {game.started && <Board type="opponent" />}
       </div>
-    </div>
+    </>
   );
 };
 

@@ -1,0 +1,80 @@
+/* portrait */
+@media screen and (max-aspect-ratio: 13/9) and (pointer: coarse) {
+  h1 {
+    margin: 1em 0em;
+    font-size: 2em;
+    line-height: 1.1;
+    text-align: center;
+    color: white
+  }
+
+  .start-view {
+    text-align: center;
+    padding: 0.2em 0em;
+    margin: 0.1em 0em;
+  }
+
+  .start-button, .end-button {
+    margin: 1em;
+    padding: 1em;
+    background-color: rgb(107, 107, 107);
+    color: white;
+    font-size: 1.2em;
+    border-radius: 10px;
+  }
+
+  .seabattle {
+    min-height: 100vh;
+    min-width: 100vw;
+  }
+
+  .boards {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+  }
+  
+  .board {
+    display: flex;
+    height: 50vh;
+  }
+
+  .board > .header {
+    text-align: center;
+  }
+
+  .canvas-container {
+    display: flex;
+    flex: 1 1 auto;
+    width: 100vw;
+    height: 100vw;
+    margin: 0em;
+  }
+
+  .end-container {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    
+    width: 100vw;
+    height: 50vh;
+  }
+  
+  .ended {
+    width: 80%;
+    height: 80%;
+    padding: 1em 0em;
+    background-color: rgba(74, 198, 200, 0.6);
+    border-radius: 20px;
+    text-align: center;
+  }
+  
+  .ended p {
+    font-size: 2em;
+    font-weight: bolder;
+    color: black;
+  }
+}
